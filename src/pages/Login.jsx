@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 export default function Login() {
   const emailRef = useRef();
@@ -22,8 +23,15 @@ export default function Login() {
       setLoading(true);
       await login(emailRef.current.value, passwordRef.current.value);
       navigate('/');
-    } catch {
-      setError('Failed to log in');
+    } catch (err) {
+      setLoading(false);
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Invalid or incorrect credentials.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else {
+        setError('Failed to log in. Please check your credentials.');
+      }
     }
     setLoading(false);
   }
@@ -33,11 +41,11 @@ export default function Login() {
       <div className="glass animate-fade-in" style={{ padding: '2.5rem', width: '100%', maxWidth: '420px', backgroundColor: 'var(--surface-card)', border: 'var(--glass-border)', position: 'relative' }}>
         <button 
           onClick={toggleTheme} 
-          className="btn-ghost" 
+          className="btn-ghost active-press" 
           style={{ 
-            position: 'absolute', top: '1.2rem', right: '1.2rem', 
-            padding: '0.4rem', border: 'none', background: 'transparent', cursor: 'pointer',
-            color: 'var(--text-secondary)', opacity: 0.6
+            position: 'absolute', top: '1rem', right: '1rem', 
+            padding: '0.5rem', border: 'none', background: 'transparent', cursor: 'pointer',
+            color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', borderRadius: '50%'
           }} 
           title="Toggle Theme"
         >
@@ -83,9 +91,10 @@ export default function Login() {
           fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)',
           opacity: 0.5, letterSpacing: '0.05em'
         }}>
-          v3.0.3
+          v4.0.2
         </div>
       </div>
+      {loading && <LoadingOverlay message="Logging you in..." />}
     </div>
   );
 }
