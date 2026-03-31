@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 export default function Signup() {
   const nameRef = useRef();
@@ -31,8 +32,16 @@ export default function Signup() {
       await signup(emailRef.current.value, passwordRef.current.value, nameRef.current.value);
       navigate('/');
     } catch (err) {
-      console.error(err);
-      setError('Failed to create an account');
+      setLoading(false);
+      if (err.code === 'auth/email-already-in-use') {
+        setError('This email is already registered.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else {
+        setError('Failed to create an account. Please try again.');
+      }
     }
     setLoading(false);
   }
@@ -115,9 +124,10 @@ export default function Signup() {
           fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)',
           opacity: 0.5, letterSpacing: '0.05em'
         }}>
-          v3.0.3
+          v4.0.2
         </div>
       </div>
+      {loading && <LoadingOverlay message="Creating your account..." />}
     </div>
   );
 }
