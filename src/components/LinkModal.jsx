@@ -142,7 +142,7 @@ export default function LinkModal({ isOpen, onClose, onSave, initialData, catego
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'border-color 0.2s'
                 }}
               >
-                <span>{category}</span>
+                <span>{categories.find(c => c.id === category)?.name || category}</span>
                 <ChevronDown size={18} style={{ color: 'var(--text-disabled)', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
               </div>
               
@@ -160,13 +160,13 @@ export default function LinkModal({ isOpen, onClose, onSave, initialData, catego
                     >
                       Uncategorized
                     </div>
-                    {categories.filter(c => c !== 'All' && c !== 'Starred' && c !== 'Uncategorized').map(c => (
+                    {categories.map(c => (
                       <div 
-                        key={c}
-                        onClick={() => { setCategory(c); setIsDropdownOpen(false); }}
-                        style={{ padding: '0.7rem 1rem', borderRadius: '0.5rem', cursor: 'pointer', backgroundColor: category === c ? 'rgba(255,255,255,0.05)' : 'transparent', color: category === c ? 'var(--accent-primary)' : 'var(--text-primary)', fontWeight: category === c ? 700 : 400 }}
+                        key={c.id}
+                        onClick={() => { setCategory(c.id); setIsDropdownOpen(false); }}
+                        style={{ padding: '0.7rem 1rem', borderRadius: '0.5rem', cursor: 'pointer', backgroundColor: category === c.id ? 'rgba(255,255,255,0.05)' : 'transparent', color: category === c.id ? 'var(--accent-primary)' : 'var(--text-primary)', fontWeight: category === c.id ? 700 : 400 }}
                       >
-                        {c}
+                        {c.name}
                       </div>
                     ))}
                   </div>

@@ -8,7 +8,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, categories, init
     categoryId: '',
     subCategory: '',
     description: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toLocaleDateString('en-CA')
   });
 
   const [isCatOpen, setIsCatOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, categories, init
         categoryId: categories[0]?.id || '',
         subCategory: '',
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toLocaleDateString('en-CA')
       });
     }
   }, [initialData, categories, isOpen]);

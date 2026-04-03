@@ -280,7 +280,7 @@ export default function LinksDashboard() {
       </div>
 
       {/* Modals */}
-      <LinkModal isOpen={isLinkModalOpen} onClose={() => setIsLinkModalOpen(false)} onSave={handleSaveLink} initialData={editingItem} categories={categories.map(c => c.id)} />
+      <LinkModal isOpen={isLinkModalOpen} onClose={() => setIsLinkModalOpen(false)} onSave={handleSaveLink} initialData={editingItem} categories={categories} />
       <CategoryModal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} onSave={handleSaveCategories} categories={categories} />
 
       {/* Delete Confirmation */}
