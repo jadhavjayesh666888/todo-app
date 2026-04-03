@@ -236,6 +236,7 @@ export default function Profile() {
             Update Password
           </button>
         </form>
+
       </div>
     </div>
   );

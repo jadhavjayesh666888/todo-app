@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Check } from 'lucide-react';
+import { X, Plus, Check, FileText } from 'lucide-react';
 
 export default function NoteModal({ isOpen, onClose, onSave, initialData }) {
   const [heading, setHeading] = useState('');
@@ -72,17 +72,26 @@ export default function NoteModal({ isOpen, onClose, onSave, initialData }) {
 
         {/* Content Area */}
         <div style={{ padding: '0 2rem 1.5rem', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            <input
-              type="text" value={heading} onChange={(e) => setHeading(e.target.value)}
-              placeholder="Note Title"
-              style={{
-                width: '100%', fontSize: '2rem', fontWeight: 700,
-                backgroundColor: 'transparent', color: 'var(--text-primary)',
-                border: 'none', padding: 0, outline: 'none',
-                letterSpacing: '-0.03em', fontFamily: "'Space Grotesk', sans-serif"
-              }}
-            />
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+            <div style={{ 
+              marginTop: '0.6rem', 
+              color: 'var(--accent-primary)', 
+              opacity: 0.6 
+            }}>
+              <FileText size={28} />
+            </div>
+            <div style={{ flex: 1, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+              <input
+                type="text" value={heading} onChange={(e) => setHeading(e.target.value)}
+                placeholder="Note Title"
+                style={{
+                  width: '100%', fontSize: '2rem', fontWeight: 700,
+                  backgroundColor: 'transparent', color: 'var(--text-primary)',
+                  border: 'none', padding: 0, outline: 'none',
+                  letterSpacing: '-0.03em', fontFamily: "'Space Grotesk', sans-serif"
+                }}
+              />
+            </div>
           </div>
 
           <textarea

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Check, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Plus, Check, ChevronDown, ChevronRight, ListTodo } from 'lucide-react';
 
 export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
   const [heading, setHeading] = useState('');
@@ -81,17 +81,26 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
 
         {/* Scrollable Content Area */}
         <div style={{ padding: '0 2rem 1rem', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            <input
-              type="text" value={heading} onChange={(e) => setHeading(e.target.value)}
-              placeholder="Todo Title"
-              style={{
-                width: '100%', fontSize: '2rem', fontWeight: 700,
-                backgroundColor: 'transparent', color: 'var(--text-primary)',
-                border: 'none', padding: 0, outline: 'none', boxShadow: 'none',
-                letterSpacing: '-0.03em', fontFamily: "'Space Grotesk', sans-serif"
-              }}
-            />
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+            <div style={{ 
+              marginTop: '0.6rem', 
+              color: 'var(--accent-primary)', 
+              opacity: 0.6 
+            }}>
+              <ListTodo size={28} />
+            </div>
+            <div style={{ flex: 1, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+              <input
+                type="text" value={heading} onChange={(e) => setHeading(e.target.value)}
+                placeholder="Todo Title"
+                style={{
+                  width: '100%', fontSize: '2rem', fontWeight: 700,
+                  backgroundColor: 'transparent', color: 'var(--text-primary)',
+                  border: 'none', padding: 0, outline: 'none', boxShadow: 'none',
+                  letterSpacing: '-0.03em', fontFamily: "'Space Grotesk', sans-serif"
+                }}
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -115,7 +124,7 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
                       flexShrink: 0
                     }}
                   >
-                    {item.done && <Check size={12} color="white" strokeWidth={4} />}
+                    {item.done && <Check size={11} color="white" strokeWidth={4} />}
                   </div>
                   <input
                     type="text" value={item.text}
@@ -187,7 +196,7 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
                       setItems(newItems);
                     }}
                     style={{
-                      width: '20px', height: '20px', borderRadius: '50%',
+                      width: '18px', height: '18px', borderRadius: '50%',
                       border: item.done ? 'none' : `2px solid var(--accent-primary)`,
                       backgroundColor: item.done ? 'var(--accent-primary)' : 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
@@ -195,7 +204,7 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
                       flexShrink: 0
                     }}
                   >
-                    {item.done && <Check size={12} color="white" strokeWidth={4} />}
+                    {item.done && <Check size={11} color="white" strokeWidth={4} />}
                   </div>
                   <input
                     type="text" value={item.text}

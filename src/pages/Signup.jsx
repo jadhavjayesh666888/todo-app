@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { Eye, EyeOff, Sun, Moon, Package } from 'lucide-react';
 import LoadingOverlay from '../components/LoadingOverlay';
 
 export default function Signup() {
@@ -30,7 +30,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signup(emailRef.current.value, passwordRef.current.value, nameRef.current.value);
-      navigate('/');
+      // Relying on AuthContext state update in App.jsx for redirection
     } catch (err) {
       setLoading(false);
       if (err.code === 'auth/email-already-in-use') {
@@ -47,7 +47,7 @@ export default function Signup() {
   }
 
   return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Roboto, sans-serif' }}>
+    <div className="auth-container" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Inter', sans-serif", padding: '1rem' }}>
       <div className="glass animate-fade-in" style={{ padding: '2.5rem', width: '100%', maxWidth: '420px', backgroundColor: 'var(--surface-card)', border: 'var(--glass-border)', position: 'relative' }}>
         <button 
           onClick={toggleTheme} 
@@ -61,8 +61,21 @@ export default function Signup() {
         >
           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
         </button>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-0.05em' }}>Sign Up</h2>
         {error && <div style={{ color: 'var(--accent-danger)', backgroundColor: 'rgba(248,81,73,0.1)', padding: '0.8rem', borderRadius: '0.5rem', marginBottom: '1.2rem', textAlign: 'center', fontSize: '0.9rem' }}>{error}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
+          <div style={{
+            width: '48px', height: '48px', borderRadius: '12px',
+            backgroundColor: 'var(--accent-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 24px rgba(129, 140, 248, 0.4)', marginBottom: '1.2rem'
+          }}>
+            <Package size={28} color="white" />
+          </div>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginBottom: '0.4rem', fontFamily: "'Space Grotesk', sans-serif" }}>MineBox</h1>
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+            Create your account
+          </h2>
+        </div>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Name</label>
@@ -124,7 +137,7 @@ export default function Signup() {
           fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)',
           opacity: 0.5, letterSpacing: '0.05em'
         }}>
-          v4.0.2
+          v5.0.0
         </div>
       </div>
       {loading && <LoadingOverlay message="Creating your account..." />}

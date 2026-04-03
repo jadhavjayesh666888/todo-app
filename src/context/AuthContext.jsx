@@ -1,15 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../services/firebase';
+import { auth, db, functions } from '../services/firebase';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
   updatePassword,
+  sendPasswordResetEmail,
   setPersistence,
   browserSessionPersistence
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+
 
 const AuthContext = createContext();
 
@@ -31,17 +33,27 @@ export const AuthProvider = ({ children }) => {
     return userCredential;
   }
 
+
+
   async function login(email, password) {
     await setPersistence(auth, browserSessionPersistence);
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+
+
   function logout() {
     return signOut(auth);
   }
   
+
+  
   function changePassword(newPassword) {
     return updatePassword(currentUser, newPassword);
+  }
+
+  function resetPassword(email) {
+    return sendPasswordResetEmail(auth, email);
   }
 
   useEffect(() => {
@@ -82,10 +94,12 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    loading,
     signup,
     login,
     logout,
-    changePassword
+    changePassword,
+    resetPassword
   };
 
   return (

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { LogOut, Plus, CheckCircle2, Sun, Moon, FileText } from 'lucide-react';
+import { LogOut, Plus, CheckCircle2, Sun, Moon, FileText, Menu, Link, Wallet } from 'lucide-react';
 import { db } from '../services/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-const Navbar = () => {
+const Navbar = ({ onHamburger, showHamburger }) => {
   const { currentUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -40,13 +40,25 @@ const Navbar = () => {
 
   const handleAction = (type) => {
     setIsActionMenuOpen(false);
-    const eventName = type === 'todo' ? 'open-add-todo' : 'open-add-note';
-    
-    if (location.pathname === '/') {
+    let eventName = 'open-add-todo';
+    let targetPath = '/todos';
+
+    if (type === 'note') {
+      eventName = 'open-add-note';
+      targetPath = '/notes';
+    } else if (type === 'link') {
+      eventName = 'open-add-link';
+      targetPath = '/links';
+    } else if (type === 'expense') {
+      eventName = 'open-add-expense';
+      targetPath = '/expenses';
+    }
+
+    if (location.pathname === targetPath) {
       window.dispatchEvent(new CustomEvent(eventName));
     } else {
-      navigate('/');
-      setTimeout(() => window.dispatchEvent(new CustomEvent(eventName)), 150);
+      navigate(targetPath);
+      setTimeout(() => window.dispatchEvent(new CustomEvent(eventName)), 200);
     }
   };
 
@@ -69,25 +81,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="nav-container">
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }} onClick={() => {
-        window.dispatchEvent(new CustomEvent('reset-filter'));
-        navigate('/');
-      }}>
-        <div style={{
-          backgroundColor: 'var(--accent-primary)', color: 'white',
-          width: '32px', height: '32px', borderRadius: '10px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(129, 140, 248, 0.4)'
-        }}>
-          <CheckCircle2 size={20} />
-        </div>
-        <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', fontFamily: 'Roboto, sans-serif' }}>TodoApp</span>
-      </div>
-
-      {/* Right icons — all equal 36×36 */}
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+    <nav className="nav-container" style={{ padding: showHamburger ? '0 1rem' : '0 2rem' }}>
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onHamburger}
+        style={iconBtnStyle}
+        className="hamburger-btn mobile-only"
+        title="Open menu"
+      >
+        <Menu size={22} />
+      </button>
+      {/* Right icons */}
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginLeft: 'auto' }}>
         <div className="action-menu-container" style={{ position: 'relative' }}>
           <button 
             onClick={() => setIsActionMenuOpen(!isActionMenuOpen)} 
@@ -121,6 +126,24 @@ const Navbar = () => {
               >
                 <FileText size={18} color="var(--accent-primary)" />
                 <span>New Note</span>
+              </button>
+              <button 
+                onClick={() => handleAction('link')} 
+                style={menuOptionStyle}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,140,248,0.1)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <Link size={18} color="var(--accent-primary)" />
+                <span>New Link</span>
+              </button>
+              <button 
+                onClick={() => handleAction('expense')} 
+                style={menuOptionStyle}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(129,140,248,0.1)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <Wallet size={18} color="var(--accent-primary)" />
+                <span>New Expense</span>
               </button>
             </div>
           )}

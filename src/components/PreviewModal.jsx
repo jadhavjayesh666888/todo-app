@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Pencil, Trash2, Calendar, Clock, FileText, CheckSquare, Star, Pin } from 'lucide-react';
+import { X, Pencil, Trash2, Calendar, Clock, FileText, Check, ListTodo, Star, Pin } from 'lucide-react';
 
 export default function PreviewModal({ isOpen, onClose, item, onEdit, onDelete }) {
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function PreviewModal({ isOpen, onClose, item, onEdit, onDelete }
               color: item.color || 'var(--text-secondary)', 
               opacity: 0.6 
             }}>
-              {isNote ? <FileText size={28} /> : <CheckSquare size={28} />}
+              {isNote ? <FileText size={28} /> : <ListTodo size={28} />}
             </div>
             <h2 style={{ 
               margin: 0, fontSize: '2.5rem', fontWeight: 800, 
@@ -100,12 +100,12 @@ export default function PreviewModal({ isOpen, onClose, item, onEdit, onDelete }
                  {item.items?.map((task, idx) => (
                    <div key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                       <div style={{ 
-                        marginTop: '0.2rem', width: '20px', height: '20px', borderRadius: '50%',
+                        marginTop: '0.2rem', width: '18px', height: '18px', borderRadius: '50%',
                         border: task.done ? 'none' : '2px solid var(--accent-primary)',
                         backgroundColor: task.done ? 'var(--accent-primary)' : 'transparent',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                       }}>
-                        {task.done && <CheckSquare color="white" size={12} strokeWidth={4} />}
+                        {task.done && <Check color="white" size={11} strokeWidth={4} />}
                       </div>
                       <span style={{ 
                         textDecoration: task.done ? 'line-through' : 'none',
@@ -117,17 +117,6 @@ export default function PreviewModal({ isOpen, onClose, item, onEdit, onDelete }
                  ))}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div style={{ padding: '1.5rem 2rem', background: 'rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={() => { onDelete(item); onClose(); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent-danger)', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="active-press">
-            <Trash2 size={16} />
-            Delete Permanent
-          </button>
-          <div style={{ color: 'var(--text-disabled)', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>
-            ID: {item.id ? item.id.substring(0, 8) : 'N/A'}
           </div>
         </div>
       </div>
