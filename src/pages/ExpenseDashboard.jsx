@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
-import { doc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { 
   Plus, Trash2, Pencil, Wallet, TrendingUp, 
   Calendar, ChevronLeft, ChevronRight, 
@@ -176,13 +176,13 @@ export default function ExpenseDashboard() {
         
         // Auto-initialize categories if empty
         if (!data.expenseCategories || data.expenseCategories.length === 0) {
-          await updateDoc(userRef, { expenseCategories: DEFAULT_CATEGORIES });
+          await setDoc(userRef, { expenseCategories: DEFAULT_CATEGORIES }, { merge: true });
         } else {
           setCategories(data.expenseCategories);
         }
       } else {
         // Handle case where user document doesn't exist yet
-        await updateDoc(userRef, { expenseCategories: DEFAULT_CATEGORIES, expenses: [] });
+        await setDoc(userRef, { expenseCategories: DEFAULT_CATEGORIES, expenses: [] }, { merge: true });
       }
       setLoading(false);
     });
@@ -299,7 +299,7 @@ export default function ExpenseDashboard() {
         updated = [...existing, { ...data, id: Date.now().toString(), createdAt: Date.now() }];
       }
       
-      await updateDoc(userRef, { expenses: updated });
+      await setDoc(userRef, { expenses: updated }, { merge: true });
       setIsExpenseModalOpen(false);
     } catch (err) { console.error(err); }
   };
@@ -309,7 +309,7 @@ export default function ExpenseDashboard() {
     try {
       const userRef = doc(db, 'users', currentUser.uid);
       const updated = expenses.filter(e => e.id !== expenseToDelete.id);
-      await updateDoc(userRef, { expenses: updated });
+      await setDoc(userRef, { expenses: updated }, { merge: true });
       setExpenseToDelete(null);
     } catch (err) { alert(err.message); }
   };
@@ -421,7 +421,7 @@ export default function ExpenseDashboard() {
       </div>
 
       {/* Analytics Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         <div className="glass" style={{ padding: '2rem', minHeight: '380px', height: 'auto', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Category Breakdown</h3>
           <div style={{ height: '240px' }}>
@@ -544,7 +544,7 @@ export default function ExpenseDashboard() {
         categories={categories}
         onSave={async (newCats) => {
           const userRef = doc(db, 'users', currentUser.uid);
-          await updateDoc(userRef, { expenseCategories: newCats });
+          await setDoc(userRef, { expenseCategories: newCats }, { merge: true });
         }}
       />
 

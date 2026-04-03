@@ -9,6 +9,7 @@ import ExpenseDashboard from './pages/ExpenseDashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import ShareTarget from './pages/ShareTarget';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 
@@ -109,12 +110,14 @@ function AppRoutes() {
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/login" element={<Navigate to="/todos" />} />
               <Route path="/signup" element={<Navigate to="/todos" />} />
+              <Route path="/share-target" element={<ShareTarget />} />
             </Routes>
           </div>
         ) : (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/share-target" element={<ShareTarget />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}

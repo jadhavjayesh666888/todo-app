@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
-import { doc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { Plus, Trash2, Pencil, Pin, Star, Link as LinkIcon, ExternalLink, Tag, Globe, Settings, Folder } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -74,7 +74,7 @@ export default function LinksDashboard() {
   const handleSaveCategories = async (updatedCategories) => {
     try {
       const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, { linkCategories: updatedCategories });
+      await setDoc(userRef, { linkCategories: updatedCategories }, { merge: true });
       setIsCategoryModalOpen(false);
     } catch (err) { alert('Failed to save categories: ' + err.message); }
   };
@@ -92,11 +92,17 @@ export default function LinksDashboard() {
       if (linkData.id) {
         updated = currentLinks.map(l => l.id === linkData.id ? { ...l, ...linkData } : l);
       } else {
-        const newLink = { ...linkData, id: Date.now().toString(), createdAt: Date.now(), pinned: false, starred: false };
+        const newLink = { 
+          ...linkData, 
+          id: Date.now().toString(), 
+          createdAt: Date.now(), 
+          pinned: false, 
+          starred: false 
+        };
         updated = [...currentLinks, newLink];
       }
 
-      await updateDoc(userRef, { links: updated });
+      await setDoc(userRef, { links: updated }, { merge: true });
       setIsLinkModalOpen(false);
     } catch (err) { alert('Failed to save link: ' + err.message); }
   };
@@ -104,20 +110,20 @@ export default function LinksDashboard() {
   const togglePin = async (id) => {
     const userRef = doc(db, 'users', currentUser.uid);
     const updated = links.map(l => l.id === id ? { ...l, pinned: !l.pinned } : l);
-    await updateDoc(userRef, { links: updated });
+    await setDoc(userRef, { links: updated }, { merge: true });
   };
 
   const toggleStar = async (id) => {
     const userRef = doc(db, 'users', currentUser.uid);
     const updated = links.map(l => l.id === id ? { ...l, starred: !l.starred } : l);
-    await updateDoc(userRef, { links: updated });
+    await setDoc(userRef, { links: updated }, { merge: true });
   };
 
   const confirmDeleteLink = async () => {
     if (!itemToDelete) return;
     const userRef = doc(db, 'users', currentUser.uid);
     const updated = links.filter(l => l.id !== itemToDelete.id);
-    await updateDoc(userRef, { links: updated });
+    await setDoc(userRef, { links: updated }, { merge: true });
     setItemToDelete(null);
   };
 

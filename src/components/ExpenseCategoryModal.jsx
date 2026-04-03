@@ -73,16 +73,17 @@ export default function ExpenseCategoryModal({ isOpen, onClose, categories, onSa
         {/* Add New Category Section */}
         <div className="glass card-p" style={{ marginBottom: '2.5rem', background: 'rgba(255,255,255,0.03)', padding: '1.5rem' }}>
           <label className="input-label" style={{ marginBottom: '0.75rem', display: 'block', fontSize: '0.9rem', fontWeight: 600 }}>Category Name</label>
-          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', alignItems: 'center' }}>
             <input 
               type="text" 
               className="input" 
+              style={{ flex: '1 1 auto', minWidth: 0 }}
               placeholder="e.g., Food, Travel..." 
               value={newCatName}
               onChange={e => setNewCatName(e.target.value)}
               onKeyPress={e => e.key === 'Enter' && addCategory()}
             />
-            <button onClick={addCategory} className="btn btn-primary" style={{ padding: '0 1.5rem' }}>
+            <button onClick={addCategory} className="btn btn-primary" style={{ flex: '0 0 auto', padding: '0.75rem 1.25rem' }}>
               <Plus size={20} />
             </button>
           </div>

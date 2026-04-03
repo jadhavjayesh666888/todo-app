@@ -115,16 +115,16 @@ export default function CategoryModal({ isOpen, onClose, categories = [], onSave
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-disabled)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Category Name</label>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                 <input 
                   type="text" 
-                  style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: '0.75rem', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none', fontFamily: "'Inter', sans-serif" }}
+                  style={{ flex: '1 1 auto', minWidth: 0, padding: '0.75rem 1rem', borderRadius: '0.75rem', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', outline: 'none', fontFamily: "'Inter', sans-serif" }}
                   placeholder="e.g., Code, Social..." 
                   value={newCatName}
                   onChange={e => setNewCatName(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && saveCategory()}
                 />
-                <button onClick={saveCategory} className="btn btn-primary" style={{ padding: '0 1.5rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <button onClick={saveCategory} className="btn btn-primary" style={{ flex: '0 0 auto', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {editingId ? <Check size={20} /> : <Plus size={20} />}
                 </button>
               </div>
