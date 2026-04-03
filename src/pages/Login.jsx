@@ -37,7 +37,13 @@ export default function Login() {
       try {
         setLoading(true);
         await login(emailRef.current.value, passwordRef.current.value);
-        // Relying on AuthContext state update in App.jsx for redirection
+        
+        // After login, check if there's a pending share to process
+        if (localStorage.getItem('pendingShare')) {
+          navigate('/share-target', { replace: true });
+        } else {
+          navigate('/todos', { replace: true });
+        }
       } catch (err) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
           setError('Invalid or incorrect credentials.');
@@ -160,7 +166,7 @@ export default function Login() {
           fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)',
           opacity: 0.5, letterSpacing: '0.05em'
         }}>
-          v5.0.2
+          v5.0.3
         </div>
       </div>
       {loading && <LoadingOverlay message={isResetMode ? "Sending reset email..." : "Logging you in..."} />}
