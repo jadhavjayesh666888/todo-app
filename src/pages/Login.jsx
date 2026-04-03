@@ -166,7 +166,7 @@ export default function Login() {
           fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-secondary)',
           opacity: 0.5, letterSpacing: '0.05em'
         }}>
-          v5.0.3
+          v5.0.4
         </div>
       </div>
       {loading && <LoadingOverlay message={isResetMode ? "Sending reset email..." : "Logging you in..."} />}
