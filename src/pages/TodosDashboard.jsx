@@ -6,9 +6,6 @@ import { Plus, Trash2, Pencil, Check, Pin, Star, ListTodo } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import TodoModal from '../components/TodoModal';
 import PreviewModal from '../components/PreviewModal';
-import TodoCategoryModal from '../components/TodoCategoryModal';
-import * as LucideIcons from 'lucide-react';
-import { Tag, Settings2, Folder } from 'lucide-react';
 
 export default function TodosDashboard() {
   const { currentUser } = useAuth();
@@ -17,10 +14,8 @@ export default function TodosDashboard() {
   const [isTodoModalOpen, setIsTodoModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
@@ -32,30 +27,6 @@ export default function TodosDashboard() {
   useEffect(() => {
     if (!currentUser) return;
     setErrorMsg('');
-    
-    // Listen for todo categories
-    const userRef = doc(db, 'users', currentUser.uid);
-    const unsubUser = onSnapshot(userRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        let cats = userData.todoCategories || [];
-        
-        // Initialize defaults if empty
-        if (cats.length === 0) {
-          const defaults = [
-            { id: 'cat_movies', name: 'Movies', icon: 'Film', color: '#ef4444' },
-            { id: 'cat_books', name: 'Books', icon: 'Book', color: '#f59e0b' },
-            { id: 'cat_personal', name: 'Personal', icon: 'Heart', color: '#ec4899' },
-            { id: 'cat_work', name: 'Work', icon: 'Briefcase', color: '#6366f1' }
-          ];
-          updateDoc(userRef, { todoCategories: defaults });
-          setCategories(defaults);
-        } else {
-          setCategories(cats);
-        }
-      }
-    });
-
     const q = query(
       collection(db, 'todos'),
       where('userId', '==', currentUser.uid),
@@ -70,11 +41,7 @@ export default function TodosDashboard() {
         return timeB - timeA;
       }));
     }, (err) => setErrorMsg(err.message));
-
-    return () => {
-      unsubUser();
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [currentUser]);
 
   const openEditModal = (item) => { setEditingItem(item); setIsTodoModalOpen(true); };
@@ -126,23 +93,8 @@ export default function TodosDashboard() {
     return new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
-  const filteredItems = items.filter(item => {
-    if (filter === 'starred' && !item.starred) return false;
-    if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
-    return true;
-  });
-
-  const handleSaveCategories = async (newCats) => {
-    try {
-      await updateDoc(doc(db, 'users', currentUser.uid), { todoCategories: newCats });
-      setIsCategoryModalOpen(false);
-    } catch (err) { alert('Failed to save categories: ' + err.message); }
-  };
-
-  const counts = { 
-    all: items.length, 
-    starred: items.filter(i => i.starred).length 
-  };
+  const filteredItems = filter === 'starred' ? items.filter(i => i.starred) : items;
+  const counts = { all: items.length, starred: items.filter(i => i.starred).length };
 
   const tabStyle = (active) => ({
     padding: '0.5rem 1.1rem', borderRadius: '999px', fontSize: '0.82rem',
@@ -158,70 +110,15 @@ export default function TodosDashboard() {
         <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.04em', fontFamily: "'Space Grotesk', sans-serif" }}>Todos</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="glass" style={{ display: 'flex', gap: '0.4rem', padding: '0.35rem', borderRadius: '999px', backgroundColor: 'var(--surface-card)', border: 'var(--glass-border)' }}>
-            <button onClick={() => setFilter('all')} style={tabStyle(filter === 'all')}>All</button>
+            <button onClick={() => setFilter('all')} style={tabStyle(filter === 'all')}>All ({counts.all})</button>
             <button onClick={() => setFilter('starred')} style={{ ...tabStyle(filter === 'starred'), display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Star size={13} fill={filter === 'starred' ? 'currentColor' : 'none'} /> Starred
+              <Star size={13} fill={filter === 'starred' ? 'currentColor' : 'none'} /> Starred ({counts.starred})
             </button>
           </div>
-          <button 
-            onClick={() => setIsCategoryModalOpen(true)} 
-            className="btn btn-ghost" 
-            style={{ borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem' }}
-          >
-            <Settings2 size={18} /> Manage Collections
-          </button>
           <button onClick={() => { setEditingItem(null); setIsTodoModalOpen(true); }} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '12px' }}>
             <Plus size={18} /> New Todo
           </button>
         </div>
-      </div>
-
-      <div style={{ 
-        display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1.5rem', 
-        marginBottom: '1rem', scrollbarWidth: 'none', msOverflowStyle: 'none'
-      }} className="no-scrollbar">
-        <button 
-          onClick={() => setCategoryFilter('all')}
-          style={{
-            whiteSpace: 'nowrap', padding: '0.6rem 1.25rem', borderRadius: '12px',
-            backgroundColor: categoryFilter === 'all' ? 'var(--accent-primary)' : 'var(--surface-card)',
-            color: categoryFilter === 'all' ? 'white' : 'var(--text-secondary)',
-            border: '1px solid var(--border-color)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
-          }}
-        >
-          All Collections
-        </button>
-        <button 
-          onClick={() => setCategoryFilter('Uncategorized')}
-          style={{
-            whiteSpace: 'nowrap', padding: '0.6rem 1.25rem', borderRadius: '12px',
-            backgroundColor: categoryFilter === 'Uncategorized' ? 'var(--accent-primary)' : 'var(--surface-card)',
-            color: categoryFilter === 'Uncategorized' ? 'white' : 'var(--text-secondary)',
-            border: '1px solid var(--border-color)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
-          }}
-        >
-          Uncategorized
-        </button>
-        {categories.map(cat => {
-          const Icon = LucideIcons[cat.icon] || Folder;
-          const isActive = categoryFilter === cat.id;
-          return (
-            <button 
-              key={cat.id} 
-              onClick={() => setCategoryFilter(cat.id)}
-              style={{
-                whiteSpace: 'nowrap', padding: '0.6rem 1.25rem', borderRadius: '12px',
-                backgroundColor: isActive ? 'var(--accent-primary)' : 'var(--surface-card)',
-                color: isActive ? 'white' : 'var(--text-secondary)',
-                border: '1px solid var(--border-color)', fontWeight: 700, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: '0.6rem', transition: 'all 0.2s'
-              }}
-            >
-              <Icon size={14} color={isActive ? 'white' : cat.color} />
-              {cat.name}
-            </button>
-          );
-        })}
       </div>
 
       {errorMsg && <div style={{ backgroundColor: 'var(--accent-danger)', color: 'white', padding: '1rem', borderRadius: '0.8rem', marginBottom: '2rem' }}><strong>Error:</strong> {errorMsg}</div>}
@@ -254,13 +151,7 @@ export default function TodosDashboard() {
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
-                    <div style={{ flexShrink: 0 }}>
-                      {(() => {
-                        const cat = categories.find(c => c.id === item.category);
-                        const Icon = cat ? (LucideIcons[cat.icon] || Folder) : ListTodo;
-                        return <Icon size={14} color={cat ? cat.color : 'var(--accent-primary)'} />;
-                      })()}
-                    </div>
+                    <div style={{ flexShrink: 0, color: 'var(--accent-primary)', opacity: 0.7 }}><ListTodo size={14} /></div>
                     <h3 className="text-ellipsis" style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, fontFamily: "'Space Grotesk', sans-serif" }}>
                       {item.heading}
                     </h3>
@@ -280,18 +171,6 @@ export default function TodosDashboard() {
                     </button>
                   </div>
                 </div>
-
-                {item.subCategory && (
-                  <div style={{ display: 'flex' }}>
-                    <span style={{ 
-                      fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.6rem', 
-                      borderRadius: '6px', backgroundColor: 'rgba(129,140,248,0.1)', 
-                      color: 'var(--accent-primary)', border: '1px solid rgba(129,140,248,0.2)'
-                    }}>
-                      {item.subCategory}
-                    </span>
-                  </div>
-                )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', flex: 1 }}>
                   {(item.items || []).length === 0 && (
@@ -351,8 +230,7 @@ export default function TodosDashboard() {
       )}
 
       <PreviewModal isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} item={previewItem} onEdit={openEditModal} onDelete={setItemToDelete} />
-      <TodoModal isOpen={isTodoModalOpen} onClose={() => setIsTodoModalOpen(false)} onSave={handleSaveItem} initialData={editingItem} categories={categories} />
-      <TodoCategoryModal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} categories={categories} onSave={handleSaveCategories} />
+      <TodoModal isOpen={isTodoModalOpen} onClose={() => setIsTodoModalOpen(false)} onSave={handleSaveItem} initialData={editingItem} />
 
       {itemToDelete && createPortal(
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>

@@ -45,7 +45,8 @@ export default defineConfig(({ mode }) => {
             title: 'title',
             text: 'text',
             url: 'url'
-          }
+          },
+          enctype: 'application/x-www-form-urlencoded'
         }
       }
     })

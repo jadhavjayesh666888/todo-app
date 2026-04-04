@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Check, ChevronDown, ChevronRight, ListTodo, Tag, Folder } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { X, Plus, Check, ChevronDown, ChevronRight, ListTodo } from 'lucide-react';
 
-export default function TodoModal({ isOpen, onClose, onSave, initialData, categories = [] }) {
+export default function TodoModal({ isOpen, onClose, onSave, initialData }) {
   const [heading, setHeading] = useState('');
   const [items, setItems] = useState([{ text: '', done: false }]);
   const [color, setColor] = useState(''); // Default to empty string (Theme matched)
   const [showTicked, setShowTicked] = useState(false);
-  const [category, setCategory] = useState('Uncategorized');
-  const [subCategory, setSubCategory] = useState('');
-  const [isCatDropdownOpen, setIsCatDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -19,14 +15,10 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData, catego
         setHeading(initialData.heading || '');
         setItems(initialData.items && initialData.items.length > 0 ? initialData.items : [{ text: '', done: false }]);
         setColor(initialData.color || '');
-        setCategory(initialData.category || 'Uncategorized');
-        setSubCategory(initialData.subCategory || '');
       } else {
         setHeading('');
         setItems([{ text: '', done: false }]);
         setColor('');
-        setCategory('Uncategorized');
-        setSubCategory('');
       }
     } else {
       document.body.style.overflow = 'unset';
@@ -53,7 +45,7 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData, catego
     if (!heading.trim() || items.every(i => !i.text.trim())) return;
     const validItems = items.filter(i => i.text.trim() !== '');
 
-    const payload = { heading, items: validItems, color, category, subCategory };
+    const payload = { heading, items: validItems, color };
     if (initialData && initialData.id) {
       payload.id = initialData.id;
     }
@@ -106,82 +98,6 @@ export default function TodoModal({ isOpen, onClose, onSave, initialData, catego
                   backgroundColor: 'transparent', color: 'var(--text-primary)',
                   border: 'none', padding: 0, outline: 'none', boxShadow: 'none',
                   letterSpacing: '-0.03em', fontFamily: "'Space Grotesk', sans-serif"
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Collection & Sub-category Selection */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
-              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 900, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Collection</label>
-              <div 
-                onClick={() => setIsCatDropdownOpen(!isCatDropdownOpen)}
-                style={{ 
-                  padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid var(--border-color)', 
-                  backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--text-primary)', cursor: 'pointer',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  {(() => {
-                    const cat = categories.find(c => c.id === category);
-                    if (cat) {
-                      const Icon = LucideIcons[cat.icon] || Folder;
-                      return <Icon size={14} color={cat.color} />;
-                    }
-                    return <Tag size={14} color="var(--text-disabled)" />;
-                  })()}
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
-                    {categories.find(c => c.id === category)?.name || 'Uncategorized'}
-                  </span>
-                </div>
-                <ChevronDown size={16} />
-              </div>
-
-              {isCatDropdownOpen && (
-                <div style={{ 
-                  position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '0.5rem', 
-                  backgroundColor: 'var(--surface-card)', borderRadius: '12px', border: '1px solid var(--border-color)',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.3)', zIndex: 100, maxHeight: '200px', overflowY: 'auto'
-                }}>
-                  <div 
-                    onClick={() => { setCategory('Uncategorized'); setIsCatDropdownOpen(false); }}
-                    style={{ padding: '0.75rem 1rem', cursor: 'pointer', fontSize: '0.9rem', borderBottom: '1px solid var(--border-color)', color: category === 'Uncategorized' ? 'var(--accent-primary)' : 'inherit' }}
-                  >
-                    Uncategorized
-                  </div>
-                  {categories.map(cat => (
-                    <div 
-                      key={cat.id}
-                      onClick={() => { setCategory(cat.id); setIsCatDropdownOpen(false); }}
-                      style={{ 
-                        padding: '0.75rem 1rem', cursor: 'pointer', fontSize: '0.9rem',
-                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                        color: category === cat.id ? 'var(--accent-primary)' : 'inherit'
-                      }}
-                    >
-                      {(() => {
-                        const Icon = LucideIcons[cat.icon] || Folder;
-                        return <Icon size={14} color={cat.color} />;
-                      })()}
-                      {cat.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{ flex: 1, minWidth: '200px' }}>
-              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 900, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Sub-category (e.g. Treasure Hunting)</label>
-              <input 
-                type="text" 
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                placeholder="None"
-                style={{ 
-                  width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid var(--border-color)', 
-                  backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--text-primary)', outline: 'none'
                 }}
               />
             </div>
