@@ -8,7 +8,7 @@ import {
   updatePassword,
   sendPasswordResetEmail,
   setPersistence,
-  browserLocalPersistence
+  browserSessionPersistence
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   async function signup(email, password, name) {
-    await setPersistence(auth, browserLocalPersistence);
+    await setPersistence(auth, browserSessionPersistence);
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     // Create profile document
     await setDoc(doc(db, "users", userCredential.user.uid), {
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
 
   async function login(email, password) {
-    await setPersistence(auth, browserLocalPersistence);
+    await setPersistence(auth, browserSessionPersistence);
     return signInWithEmailAndPassword(auth, email, password);
   }
 

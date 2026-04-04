@@ -59,12 +59,14 @@ function AppRoutes() {
           {/* Sidebar container */}
           <div style={{
             position: 'fixed',
-            left: isMobile ? (isMobileOpen ? '0' : '-300px') : '0',
+            left: 0,
+            transform: isMobile ? (isMobileOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
             top: 0,
             width: isMobile ? '260px' : (isCollapsed ? '72px' : '260px'),
-            transition: 'left 0.35s cubic-bezier(0.4,0,0.2,1)',
+            transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s ease',
             zIndex: 1000,
-            height: '100vh'
+            height: '100vh',
+            willChange: 'transform'
           }}>
             <Sidebar
               isCollapsed={isMobile ? false : isCollapsed}
